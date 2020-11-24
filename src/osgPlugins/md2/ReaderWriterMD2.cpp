@@ -165,7 +165,10 @@ load_md2 (const char *filename, const osgDB::ReaderWriter::Options* options)
         return NULL;
     }
 
-    file_fd = open (filename, O_RDONLY);
+    // modify by lijing at 2020.11.22, 
+    // because the \r\n , the size of return from read might not the file size on windows, this will return NULL
+    file_fd = open (filename, O_RDONLY|O_RAW);
+    //file_fd = open (filename, O_RDONLY);
     if (file_fd < 0) {
         return NULL;
     }
@@ -177,7 +180,9 @@ load_md2 (const char *filename, const osgDB::ReaderWriter::Options* options)
         return NULL;
     }
 
-    if (read(file_fd, mapbase, st.st_size) != st.st_size)
+    //if (read(file_fd, mapbase, st.st_size) != st.st_size)
+    int rsize = read(file_fd, mapbase, st.st_size);
+    if (rsize != st.st_size)
     {
         close (file_fd);
         if (mapbase) free(mapbase);
